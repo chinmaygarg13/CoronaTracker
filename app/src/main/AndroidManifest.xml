@@ -25,6 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+<!--        tools:replace="android:appComponentFactory">-->
 
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"

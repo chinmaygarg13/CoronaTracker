@@ -9,11 +9,14 @@ import androidx.annotation.RequiresApi;
 
 public class App extends Application {
     public static final String CHANNEL_ID = "exampleServiceChannel";
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCreate()
     {
         super.onCreate();;
-        createNotificationChannel();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            createNotificationChannel();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
