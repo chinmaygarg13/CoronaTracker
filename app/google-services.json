@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:4555842865:android:4d8e80889220730a57bc10",
         "android_client_info": {
-          "package_name": "com.jpg.coronatracker"
+          "package_name": "com.example.service_example"
         }
       },
       "oauth_client": [
@@ -22,6 +22,9 @@
       "api_key": [
         {
           "current_key": "AIzaSyAe-CLZf-HXSZ3wiL8Q8fQzQ9d8ufqrTe0"
+        },
+        {
+          "current_key": "AIzaSyCnlZDwBz32TGltMUUq57VQlPaHiPnt47E"
         }
       ],
       "services": {
@@ -37,9 +40,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:4555842865:android:aa1d0cf4cd63140357bc10",
+        "mobilesdk_app_id": "1:4555842865:android:7a4441b8910d1d5457bc10",
         "android_client_info": {
-          "package_name": "com.example.service_exmple"
+          "package_name": "com.jpg.coronatracker"
         }
       },
       "oauth_client": [
@@ -51,6 +54,9 @@
       "api_key": [
         {
           "current_key": "AIzaSyAe-CLZf-HXSZ3wiL8Q8fQzQ9d8ufqrTe0"
+        },
+        {
+          "current_key": "AIzaSyCnlZDwBz32TGltMUUq57VQlPaHiPnt47E"
         }
       ],
       "services": {
