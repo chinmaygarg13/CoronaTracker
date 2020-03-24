@@ -34,7 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NearbyActivity" />
+        <!--activity android:name=".NearbyActivity" /-->
     </application>
 
 </manifest>

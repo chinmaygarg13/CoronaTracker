@@ -1,5 +1,5 @@
 //package com.codinginflow.foregroundserviceexample;
-package com.example.service_example;
+package com.jpg.coronatracker;
 
 import android.Manifest;
 import android.content.Context;

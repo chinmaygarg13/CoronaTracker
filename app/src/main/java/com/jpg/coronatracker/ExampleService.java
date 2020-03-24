@@ -1,4 +1,4 @@
-package com.example.service_example;
+package com.jpg.coronatracker;
 
 //package com.codinginflow.foregroundserviceexample;
 
@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 //
 //import static com.codinginflow.foregroundserviceexample.App.CHANNEL_ID;
 
-import static com.example.service_example.App.CHANNEL_ID;
+import static com.jpg.coronatracker.App.CHANNEL_ID;
 //import static com.example.service_example.;
 
 public class ExampleService extends Service {

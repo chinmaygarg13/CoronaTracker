@@ -1,4 +1,4 @@
-package com.example.service_example;
+package com.jpg.coronatracker;
 
 import android.app.Application;
 import android.app.NotificationChannel;
