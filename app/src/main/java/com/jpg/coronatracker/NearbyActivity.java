@@ -1,16 +1,25 @@
 package com.jpg.coronatracker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+//import android.support.annotation.CallSuper;
+//import android.support.annotation.NonNull;
+//import android.support.annotation.Nullable;
+//import android.support.v4.app.ActivityCompat;
+//import android.support.v4.content.ContextCompat;
+//import android.support.v7.app.AppCompatActivity;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
+
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,7 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class NearbyActivity extends AppCompatActivity {
+public class NearbyActivity extends AppCompatActivity {
 
     /**
      * These permissions are required before connecting to Nearby Connections. Only {@link
@@ -47,12 +56,14 @@ public abstract class NearbyActivity extends AppCompatActivity {
      * granted just by having them in our AndroidManfiest.xml
      */
     private static final String[] REQUIRED_PERMISSIONS =
-            new String[] {
+            new String[]{
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN,
                     Manifest.permission.ACCESS_WIFI_STATE,
                     Manifest.permission.CHANGE_WIFI_STATE,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_PHONE_NUMBERS
             };
 
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
@@ -161,13 +172,11 @@ public abstract class NearbyActivity extends AppCompatActivity {
         super.onStart();
         //ye get permission wala part tu chahe to mainactivity mai bhi daal de.
         if (!hasPermissions(this, getRequiredPermissions())) {
-            if (!hasPermissions(this, getRequiredPermissions())) {
-                if (Build.VERSION.SDK_INT < 23) {
-                    ActivityCompat.requestPermissions(
-                            this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-                } else {
-                    requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-                }
+            if (Build.VERSION.SDK_INT < 23) {
+                ActivityCompat.requestPermissions(
+                        this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+            } else {
+                requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
             }
         }
     }
@@ -239,10 +248,12 @@ public abstract class NearbyActivity extends AppCompatActivity {
     }
 
     /** Called when advertising successfully starts. Override this method to act on the event. */
-    protected void onAdvertisingStarted() {}
+    protected void onAdvertisingStarted() {
+    }
 
     /** Called when advertising fails to start. Override this method to act on the event. */
-    protected void onAdvertisingFailed() {}
+    protected void onAdvertisingFailed() {
+    }
     //re advertise or look for problems
 
     /**
@@ -251,7 +262,8 @@ public abstract class NearbyActivity extends AppCompatActivity {
      * we want to continue with the connection, call {@link #acceptConnection(Endpoint)}. Otherwise,
      * call {@link #rejectConnection(Endpoint)}.
      */
-    protected void onConnectionInitiated(Endpoint endpoint, ConnectionInfo connectionInfo) {}
+    protected void onConnectionInitiated(Endpoint endpoint, ConnectionInfo connectionInfo) {
+    }
 
     /** Accepts a connection request. */
     protected void acceptConnection(final Endpoint endpoint) {
@@ -344,17 +356,20 @@ public abstract class NearbyActivity extends AppCompatActivity {
     }
 
     /** Called when discovery successfully starts. Override this method to act on the event. */
-    protected void onDiscoveryStarted() {}
+    protected void onDiscoveryStarted() {
+    }
 
     /** Called when discovery fails to start. Override this method to act on the event. */
-    protected void onDiscoveryFailed() {}
+    protected void onDiscoveryFailed() {
+    }
 
     /**
      * Called when a remote endpoint is discovered. To connect to the device, call {@link
      * #connectToEndpoint(Endpoint)}.
      */
     //maybe first check then connect or connect then check not sure
-    protected void onEndpointDiscovered(Endpoint endpoint) {}
+    protected void onEndpointDiscovered(Endpoint endpoint) {
+    }
 
     /** Disconnects from the given endpoint. */
     protected void disconnect(Endpoint endpoint) {
@@ -426,13 +441,16 @@ public abstract class NearbyActivity extends AppCompatActivity {
      * Called when a connection with this endpoint has failed. Override this method to act on the
      * event.
      */
-    protected void onConnectionFailed(Endpoint endpoint) {}
+    protected void onConnectionFailed(Endpoint endpoint) {
+    }
 
     /** Called when someone has connected to us. Override this method to act on the event. */
-    protected void onEndpointConnected(Endpoint endpoint) {}
+    protected void onEndpointConnected(Endpoint endpoint) {
+    }
 
     /** Called when someone has disconnected. Override this method to act on the event. */
-    protected void onEndpointDisconnected(Endpoint endpoint) {}
+    protected void onEndpointDisconnected(Endpoint endpoint) {
+    }
 
     /** Returns a list of currently connected endpoints. */
     protected Set<Endpoint> getDiscoveredEndpoints() {
@@ -471,7 +489,8 @@ public abstract class NearbyActivity extends AppCompatActivity {
      * @param endpoint The sender.
      * @param payload The data.
      */
-    protected void onReceive(Endpoint endpoint, Payload payload) {}
+    protected void onReceive(Endpoint endpoint, Payload payload) {
+    }
 
     /**
      * An optional hook to pool any permissions the app needs with the permissions ConnectionsActivity
@@ -484,15 +503,27 @@ public abstract class NearbyActivity extends AppCompatActivity {
     }
 
     /** Returns the client's name. Visible to others when connecting. */
-    protected abstract String getName();
+
+    protected String getName(){
+        return "Chinmay Garg";
+        //TODO: take name as input from user, store in a shared pref and return here.
+    }
+
+    @SuppressLint("MissingPermission")
+    protected String getMob() {
+        TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        return tMgr.getLine1Number();
+    }
     //I guess we can return mobile number here.
 
     /**
      * Returns the service id. This represents the action this connection is for. When discovering,
      * we'll verify that the advertiser has the same service id before we consider connecting to them.
      */
-    protected abstract String getServiceId();
-    //not needed.
+    protected String getServiceId(){
+        return "com.jpg.coronatracker";
+    }
+    //
 
     /**
      * Returns the strategy we use to connect to other devices. Only devices using the same strategy
@@ -500,7 +531,9 @@ public abstract class NearbyActivity extends AppCompatActivity {
      * connections are possible at the same time, as well as how much bandwidth is available for use.
      */
     //p2p_cluster
-    protected abstract Strategy getStrategy();
+    protected Strategy getStrategy(){
+        return Strategy.P2P_CLUSTER;
+    }
 
     /**
      * Transforms a {@link Status} into a English-readable message for logging.
@@ -558,14 +591,16 @@ public abstract class NearbyActivity extends AppCompatActivity {
     }
 
     /** Represents a device we can talk to. */
-    protected static class Endpoint {
+    protected class Endpoint {
         //we can manipulate this class so that it has only mobile number and maybe timestamp.
         @NonNull private final String id;
         @NonNull private final String name;
+        @NonNull private String mob;
 
         private Endpoint(@NonNull String id, @NonNull String name) {
             this.id = id;
             this.name = name;
+            mob = getMob();
         }
 
         @NonNull
@@ -577,6 +612,9 @@ public abstract class NearbyActivity extends AppCompatActivity {
         public String getName() {
             return name;
         }
+
+        @NonNull
+        public String getMob() { return mob; }
 
         @Override
         public boolean equals(Object obj) {
