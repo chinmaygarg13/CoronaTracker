@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -36,7 +37,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //editTextInput = findViewById(R.id.edit_text_input);
+        final EditText et_name = findViewById(R.id.name);
+        final EditText et_phone = findViewById(R.id.phone);
+        final Button b_enter = findViewById(R.id.enter);
+        final Button b_service = findViewById(R.id.service);
+
+        final SharedPreferences pref = this.getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+
+        b_enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = et_name.getText().toString();
+                String phone = et_phone.getText().toString();
+                if(phone.length() != 10){
+                    b_enter.setClickable(true);
+                    Toast.makeText(MainActivity.this, "Please enter valid mobile number.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    pref.edit().putString("name", name).apply();
+                    pref.edit().putString("phone", phone).apply();
+                    b_enter.setVisibility(View.GONE);
+                    et_name.setVisibility(View.GONE);
+                    et_phone.setVisibility(View.GONE);
+                    b_service.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
     }
 
         private static final String[] REQUIRED_PERMISSIONS =
