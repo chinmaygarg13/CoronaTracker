@@ -2,10 +2,10 @@
 
 <LinearLayout tools:context="com.jpg.coronatracker.MainActivity" android:padding="16dp" android:orientation="vertical" android:gravity="center" android:layout_height="match_parent" android:layout_width="match_parent" xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
 
-<EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:hint="Input" android:id="@+id/edit_text_input"/>
+<!--<EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:hint="Input" android:id="@+id/edit_text_input"/>-->
 
 <Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Start Service" android:onClick="startService"/>
 
-<Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Stop Service" android:onClick="stopService"/>
+<!--<Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Stop Service" android:onClick="stopService"/>-->
 
 </LinearLayout>

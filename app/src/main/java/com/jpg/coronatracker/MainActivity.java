@@ -25,19 +25,19 @@ import com.google.firebase.storage.StorageReference;
 //import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText editTextInput;
+    //private EditText editTextInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextInput = findViewById(R.id.edit_text_input);
+        //editTextInput = findViewById(R.id.edit_text_input);
     }
 
     public void startService(View v) {
-        String input = editTextInput.getText().toString();
-
+        //String input = editTextInput.getText().toString();
+        String input;
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -52,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        Toast.makeText(this, "Hi", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show();
         /* Extract the IMEI of the person */
         input = tMgr.getDeviceId();
         //Boilerplate code to write a message to the database. Change/Create the hierarchy in getReference and set it's value to something
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference(input);
-        myRef.setValue(input);
+        myRef.setValue("Hello");
 
 
 
@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
-    public void stopService(View v) {
-        Intent serviceIntent = new Intent(this, ExampleService.class);
-        stopService(serviceIntent);
-    }
+//    public void stopService(View v) {
+//        Intent serviceIntent = new Intent(this, ExampleService.class);
+//        stopService(serviceIntent);
+//    }
 }
