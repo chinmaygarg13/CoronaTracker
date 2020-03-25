@@ -55,6 +55,7 @@ import androidx.core.content.ContextCompat;
 //
 //import static com.codinginflow.foregroundserviceexample.App.CHANNEL_ID;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 import static com.jpg.coronatracker.App.CHANNEL_ID;
 //import static com.example.service_example.;
 
@@ -101,11 +102,13 @@ public class ExampleService extends Service {
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_OFF)
-                // Bluetooth is disconnected, do handling here
+                        == BluetoothAdapter.STATE_OFF) {
+                    // Bluetooth is disconnected, do handling here
+                    BluetoothAdapter.getDefaultAdapter().enable();
                     startAdvertisin();
                     startDiscovery();
-                    Toast.makeText(ExampleService.this,"Corona korona ko hai bhagana to bluetooth hume hai on rakhna.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExampleService.this, "Corona ko bhagana hai to bluetooth hume hai ON rakhna.", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
