@@ -2,6 +2,7 @@
 package com.jpg.coronatracker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 
@@ -42,25 +43,21 @@ public class MainActivity extends AppCompatActivity {
         final Button b_enter = findViewById(R.id.enter);
         final Button b_service = findViewById(R.id.service);
 
-        final SharedPreferences pref = this.getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+        final SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
 
         b_enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = et_name.getText().toString();
                 String phone = et_phone.getText().toString();
-                if(phone.length() != 10){
-                    b_enter.setClickable(true);
-                    Toast.makeText(MainActivity.this, "Please enter valid mobile number.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    pref.edit().putString("name", name).apply();
-                    pref.edit().putString("phone", phone).apply();
-                    b_enter.setVisibility(View.GONE);
-                    et_name.setVisibility(View.GONE);
-                    et_phone.setVisibility(View.GONE);
-                    b_service.setVisibility(View.VISIBLE);
-                }
+
+                pref.edit().putString("name", name).apply();
+                pref.edit().putString("phone", phone).apply();
+
+                b_enter.setVisibility(View.GONE);
+                et_name.setVisibility(View.GONE);
+                et_phone.setVisibility(View.GONE);
+                b_service.setVisibility(View.VISIBLE);
             }
         });
 
@@ -127,24 +124,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("MissingPermission")
     public void startService(View v) {
         //String input = editTextInput.getText().toString();
         String input;
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(this, "Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        Toast.makeText(this, "Hello", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "YO YO YO YO YO", Toast.LENGTH_LONG).show();
         /* Extract the IMEI of the person */
         input = tMgr.getDeviceId();
         //Boilerplate code to write a message to the database. Change/Create the hierarchy in getReference and set it's value to something
@@ -152,8 +138,14 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference myRef = database.getReference(input);
         myRef.setValue("Hello");
 
-        SharedPreferences pref = this.getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+        //Toast.makeText(this, input, Toast.LENGTH_LONG).show();
+
+
+        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
         pref.edit().putString("emei", input).apply();
+
+        String temp = pref.getString("emei",null);
+        //Toast.makeText(this, temp, Toast.LENGTH_LONG).show();
 
 
 

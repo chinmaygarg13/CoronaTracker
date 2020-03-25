@@ -3,7 +3,10 @@ package com.jpg.coronatracker;
 //package com.codinginflow.foregroundserviceexample;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -60,37 +63,52 @@ public class ExampleService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
 
+        //Toast.makeText(this, "yaha to aa raha hai.....", Toast.LENGTH_LONG).show();
+
         Intent notificationIntent = new Intent(this, MainActivity.class);
 //        PendingIntent pendingIntent = PendingIntent.getActivity(this,
 //                0, notificationIntent, 0);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Example Service")
-                .setContentText(input)
+                //.setContentTitle("CoronaTracker")
+                //.setContentText("")
                 .setSmallIcon(R.drawable.ic_android)
 //                .setContentIntent(pendingIntent)
                 .build();
 
         startForeground(1, notification);
 
-
         //do heavy work on a background thread
         //stopSelf();
-
-
         startDiscovery();
         startAdvertisin();
-
 
         return START_STICKY;
     }
 
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive (Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_OFF)
+                // Bluetooth is disconnected, do handling here
+                    startAdvertisin();
+                    startDiscovery();
+                    Toast.makeText(ExampleService.this,"Corona korona ko hai bhagana to bluetooth hume hai on rakhna.",Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     private ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
@@ -231,7 +249,7 @@ public class ExampleService extends Service {
 
     private void startDiscovery() {
 
-        Toast.makeText(this,"Discovering",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Discovering",Toast.LENGTH_SHORT).show();
         var = this;
 
         DiscoveryOptions discoveryOptions =
@@ -493,7 +511,6 @@ public class ExampleService extends Service {
         return Strategy.P2P_CLUSTER;
     }
 
-    SharedPreferences pref = this.getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
 
     /** Represents a device we can talk to. */
     protected class Endpoint {
@@ -506,6 +523,7 @@ public class ExampleService extends Service {
         private Endpoint(@NonNull String id, @NonNull String name) {
             this.id = id;
             this.name = name;
+            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
             this.emei = pref.getString("emei", null);
         }
 
