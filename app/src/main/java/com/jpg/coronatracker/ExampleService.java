@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.icu.util.DateInterval;
 import android.os.Build;
 import android.os.Handler;
 import android.app.Notification;
@@ -17,6 +18,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 //import android.support.v4.app.NotificationCompat;
@@ -39,6 +41,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
@@ -73,6 +76,7 @@ public class ExampleService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String input = intent.getStringExtra("inputExtra");
 
+        Log.d("service","Service has started successfully");
         //Toast.makeText(this, "yaha to aa raha hai.....", Toast.LENGTH_LONG).show();
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -90,6 +94,7 @@ public class ExampleService extends Service {
 
         //do heavy work on a background thread
         //stopSelf();
+
         startDiscovery();
         startAdvertisin();
 
@@ -119,6 +124,10 @@ public class ExampleService extends Service {
             //do something
             //Toast.makeText(this,"Nearby working atleast",Toast.LENGTH_SHORT).show();
             //Toast.makeText(this,"",Toast.LENGTH_SHORT);
+            Nearby.getConnectionsClient(ExampleService.this).disconnectFromEndpoint(s);
+            //Toast.makeText(ExampleService.this,s,Toast.LENGTH_LONG).show();
+            Log.d("service","in OnConnection Initiated");
+            Log.d("service",String.valueOf(connectionInfo));
             System.out.println("HELLO");
         }
 
@@ -148,9 +157,10 @@ public class ExampleService extends Service {
         }
     };
 
-
+    private Context adv;
     private void startAdvertisin() {
 
+        Log.d("service","in Start Adv");
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && this.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)!=PackageManager.PERMISSION_GRANTED)
         {
             Toast.makeText(this,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
@@ -160,6 +170,7 @@ public class ExampleService extends Service {
         String endPoint = tMgr.getDeviceId();
 
 
+        adv = this;
         AdvertisingOptions advertisingOptions =
                 new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
         Nearby.getConnectionsClient(this)
@@ -200,18 +211,9 @@ public class ExampleService extends Service {
         public void onEndpointFound(@NonNull String s, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo) {
             //let's write to firebase now
             String discoverer_endpoint;
-
-//            if (ActivityCompat.checkSelfPermission(var, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                Toast.makeText(var, "Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+            Log.d("endpoint_found","in onEndpointFound");
+            Log.d("endpoint_found",s);
+            Log.d("endpoint_found",discoveredEndpointInfo.getEndpointName());
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && var.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)!=PackageManager.PERMISSION_GRANTED)
             {
@@ -219,35 +221,64 @@ public class ExampleService extends Service {
             }
 
 
-
             TelephonyManager tMgr = (TelephonyManager) var.getSystemService(Context.TELEPHONY_SERVICE);
             discoverer_endpoint = tMgr.getDeviceId();
 
-            Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
-
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(discoverer_endpoint);
-            myRef.keepSynced(true);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss");
             String dt = sdf.format(new Date());
 
-            Pair<String,DiscoveredEndpointInfo> pair = new Pair<>(dt,discoveredEndpointInfo);
-//            JSONObject obj = new JSONObject();
-//
-//            try {
-//                obj.put("timestamp",dt);
-//                obj.put("info",discoveredEndpointInfo);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-            //myRef.setValue(discoveredEndpointInfo);
-            DatabaseReference newRef = myRef.push();
-            newRef.setValue(pair);
+            Pair<String,String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
+
+            Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
+            Log.d("endpoint_discovered","DISCOVERED");
+            Log.d("endpoint_discovered",discoveredEndpointInfo.getEndpointName());
+            Log.d("endpoint_discovered",dt);
+
+            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+
+            Log.d("time",String.valueOf(pref.getAll()));
+            final Date T = new Date((new Date(System.currentTimeMillis()+5*60*1000)).getTime()-(new Date()).getTime());
+            String old_date = pref.getString(discoveredEndpointInfo.getEndpointName(), null);
+            Log.d("time","DATE");
+            Date current_date = new Date();//Current date time
+            Date diff = new Date();//initialize difference
+            Date old=null;
+            if(old_date!=null) {
+                //compute the difference
+                Log.d("time",old_date);
+                try {
+                    old = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss").parse((String) old_date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                diff = new Date(current_date.getTime() - old.getTime());
+                Log.d("time","Reached difference calculator");
+                Log.d("time",String.valueOf(diff));
+            }
+            if(old==null || diff.getTime()>T.getTime())
+            {
+                Log.d("time","writing");
+                Log.d("time",String.valueOf(old==null));
+                if(old!=null)Log.d("time",String.valueOf(old));
+                pref.edit().putString(discoveredEndpointInfo.getEndpointName(),String.valueOf(dt)).apply();
+                //pref.edit().apply();
+                DatabaseReference newRef = myRef.push();
+                //DatabaseReference n = myRef.getRef(discoveredEndpointInfo.getEndpointName());
+                newRef.setValue(pair);
+            }
+            Nearby.getConnectionsClient(ExampleService.this).rejectConnection(discoveredEndpointInfo.getEndpointName());
+            //Nearby.getConnectionsClient(ExampleService.this).disconnectFromEndpoint(discoveredEndpointInfo.getEndpointName());
         }
 
         @Override
         public void onEndpointLost(@NonNull String s) {
             //do something
+            //forget the endpoint
+            Log.d("end_point_lost","I also visit this function");
+            //Log.d("end_point_lost",s);
         }
     };
 
@@ -259,16 +290,10 @@ public class ExampleService extends Service {
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
         Nearby.getConnectionsClient(this)
-                .startDiscovery("com.jpg.coronatracker", endpointDiscoveryCallback, discoveryOptions);
-//                .addOnSuccessListener(
-//                        (Void unused) -> {
-//                            // We're discovering!
-//                        })
-//                .addOnFailureListener(
-//                        (Exception e) -> {
-//                            // We're unable to start discovering.
-//                        })
-
+                .startDiscovery("com.jpg.coronatracker", endpointDiscoveryCallback, discoveryOptions)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+        Log.d("service","in discovery");
     }
 
     @Override

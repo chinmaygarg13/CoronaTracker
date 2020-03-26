@@ -134,9 +134,9 @@ public class MainActivity extends AppCompatActivity {
         /* Extract the IMEI of the person */
         input = tMgr.getDeviceId();
         //Boilerplate code to write a message to the database. Change/Create the hierarchy in getReference and set it's value to something
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(input);
-        myRef.setValue("Hello");
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference myRef = database.getReference(input);
+//        myRef.setValue("Hello");
 
         //Toast.makeText(this, input, Toast.LENGTH_LONG).show();
 
@@ -146,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
 
         String temp = pref.getString("emei",null);
         //Toast.makeText(this, temp, Toast.LENGTH_LONG).show();
+
+
+
 
 
 
