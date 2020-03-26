@@ -36,14 +36,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+
         setContentView(R.layout.activity_main);
+
+        Boolean ft = pref.getBoolean("first_time", true);
 
         final EditText et_name = findViewById(R.id.name);
         final EditText et_phone = findViewById(R.id.phone);
         final Button b_enter = findViewById(R.id.enter);
         final Button b_service = findViewById(R.id.service);
 
-        final SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+        if(ft == false){
+            b_enter.setVisibility(View.GONE);
+            et_name.setVisibility(View.GONE);
+            et_phone.setVisibility(View.GONE);
+            b_service.setVisibility(View.VISIBLE);
+        }
 
         b_enter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
                 pref.edit().putString("name", name).apply();
                 pref.edit().putString("phone", phone).apply();
+                pref.edit().putBoolean("first_time", false).apply();
 
                 b_enter.setVisibility(View.GONE);
                 et_name.setVisibility(View.GONE);
@@ -124,56 +135,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void minimizeApp() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
     @SuppressLint("MissingPermission")
     public void startService(View v) {
-        //String input = editTextInput.getText().toString();
         String input;
 
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        //Toast.makeText(this, "YO YO YO YO YO", Toast.LENGTH_LONG).show();
-        /* Extract the IMEI of the person */
         input = tMgr.getDeviceId();
-        //Boilerplate code to write a message to the database. Change/Create the hierarchy in getReference and set it's value to something
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference myRef = database.getReference(input);
-//        myRef.setValue("Hello");
-
-        //Toast.makeText(this, input, Toast.LENGTH_LONG).show();
-
 
         SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
         pref.edit().putString("emei", input).apply();
-
-        String temp = pref.getString("emei",null);
-        //Toast.makeText(this, temp, Toast.LENGTH_LONG).show();
-
-
-
-
-
-
-
-
-
-//        To use Firebase Storage
-//        FirebaseStorage storage = FirebaseStorage.getInstance();
-//        StorageReference storageRef = storage.getReference();
-
-
-
-
-
-
 
         Intent serviceIntent = new Intent(this, ExampleService.class);
         serviceIntent.putExtra("inputExtra", input);
 
         ContextCompat.startForegroundService(this, serviceIntent);
+        minimizeApp();
     }
-
-
-//    public void stopService(View v) {
-//        Intent serviceIntent = new Intent(this, ExampleService.class);
-//        stopService(serviceIntent);
-//    }
 }
