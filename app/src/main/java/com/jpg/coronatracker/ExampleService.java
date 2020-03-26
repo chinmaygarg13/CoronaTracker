@@ -226,6 +226,7 @@ public class ExampleService extends Service {
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(discoverer_endpoint);
+            myRef.keepSynced(true);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss");
             String dt = sdf.format(new Date());
 
