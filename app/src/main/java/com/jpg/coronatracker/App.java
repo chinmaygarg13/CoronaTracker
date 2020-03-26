@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import androidx.annotation.RequiresApi;
 
 public class App extends Application {
@@ -17,6 +19,7 @@ public class App extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             createNotificationChannel();
         }
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

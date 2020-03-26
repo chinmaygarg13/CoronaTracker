@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
+
 //    public void stopService(View v) {
 //        Intent serviceIntent = new Intent(this, ExampleService.class);
 //        stopService(serviceIntent);

@@ -107,7 +107,7 @@ public class ExampleService extends Service {
                     BluetoothAdapter.getDefaultAdapter().enable();
                     startAdvertisin();
                     startDiscovery();
-                    Toast.makeText(ExampleService.this, "Corona ko bhagana hai to bluetooth hume hai ON rakhna.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExampleService.this, "Corona ko bhagana hai to bluetooth hume hai ON rakhna.", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -227,6 +227,7 @@ public class ExampleService extends Service {
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(discoverer_endpoint);
+            myRef.keepSynced(true);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss");
             String dt = sdf.format(new Date());
 
