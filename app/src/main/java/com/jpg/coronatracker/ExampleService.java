@@ -3,13 +3,16 @@ package com.jpg.coronatracker;
 //package com.codinginflow.foregroundserviceexample;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.icu.util.DateInterval;
+import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
 import android.app.Notification;
@@ -17,12 +20,22 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 //import android.support.v4.app.NotificationCompat;
 //import android.support.annotation.Nullable;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -35,6 +48,7 @@ import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -49,6 +63,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -64,12 +79,54 @@ import static com.jpg.coronatracker.App.CHANNEL_ID;
 
 public class ExampleService extends Service {
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location mCurrentLocation;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+
+
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
         super.onCreate();
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            mCurrentLocation = location;
+                        }
+                    }
+                });
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                    /**TODO- send location to firebase. For timestamp, do not use location.getTime().
+                     For latitude: location.getLatitude, longitude: location.getLongitude.
+                     For accuracy: location.getAccuracy (it will be used later to draw circle)**/
+                    Log.d("location",location.toString());
+
+                }
+            }
+        };
+
+        createLocationRequest();
+        startLocationUpdates();
+
     }
 
     @Override
@@ -99,6 +156,21 @@ public class ExampleService extends Service {
         startAdvertisin();
 
         return START_STICKY;
+    }
+
+    protected void createLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(30*60*1000);
+        locationRequest.setFastestInterval(10*60*1000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setSmallestDisplacement(50);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

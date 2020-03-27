@@ -70,7 +70,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintVertical_bias="0.8"
-        android:text="This app can automatically turn off after some time of inactivity to save battery. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/>
+        android:text="This app may automatically turn off automatically in rare cases to save battery and RAM. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/>
 
 
 <!--<Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Stop Service" android:onClick="stopService"/>-->

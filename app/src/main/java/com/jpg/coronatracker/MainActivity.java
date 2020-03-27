@@ -82,9 +82,10 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.ACCESS_WIFI_STATE,
                     Manifest.permission.CHANGE_WIFI_STATE,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.READ_PHONE_NUMBERS
-            };
+                    Manifest.permission.READ_PHONE_NUMBERS,
+        };
 
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
 
