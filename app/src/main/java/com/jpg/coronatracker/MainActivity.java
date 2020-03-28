@@ -80,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
                 TelephonyManager tMgr = (TelephonyManager) MainActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
 
-                @SuppressLint("MissingPermission") String imei = tMgr.getDeviceId();
+                @SuppressLint("MissingPermission") String imei = tMgr.getImei();
+
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference(imei);

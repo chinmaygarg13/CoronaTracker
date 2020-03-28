@@ -23,6 +23,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Looper;
 import android.renderscript.Sampler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -322,11 +323,13 @@ public class ExampleService extends Service {
                     if(dataSnapshot.getValue()==null) {
                         //Log.d("db", dataSnapshot.getValue().toString());
                        Log.d("db","I am here");
+                       Log.d("db",dataSnapshot.getKey());
 
                         //
                     }
-
-                    String my_degree = dataSnapshot.getValue().toString();
+                    //Log.d("db",my_degree);
+                    my_degree = dataSnapshot.getValue().toString();
+                    Log.d("db",my_degree);
                     if(my_degree=="2")
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
@@ -358,10 +361,11 @@ public class ExampleService extends Service {
             //myRef.removeEventListener(valueEventListener2);
             Log.d("db","post first db on discovery");
 
-            DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName());
 
 
 
+
+            DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName()+"/degree_infected");
             ValueEventListener valueEventListener = new ValueEventListener() {
 
                 @Override
@@ -370,11 +374,12 @@ public class ExampleService extends Service {
                     String degree_infected = dataSnapshot.getValue().toString();
                     Log.d("readdb",degree_infected);
 
-                    if (degree_infected == "2" || degree_infected == "1") {
+                    if (degree_infected.equals("2") || degree_infected.equals("1")) {
+                        Log.d("db","Reaching inside, hence string");
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.ic_android);
                         mBuilder.setContentTitle("YOU ARE IN DANGER");
-                        if (degree_infected == "1") {
+                        if (degree_infected.equals("1")) {
                             mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
                         } else {
                             mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
@@ -432,12 +437,6 @@ public class ExampleService extends Service {
             if(old_date!=null) {
                 //compute the difference
                 Log.d("time",old_date.toString());
-//                try {
-//                    old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse((String) old_date);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-
                 diff = new Date(current_date- old).getTime();
                 Log.d("time","Reached difference calculator");
                 Log.d("time",diff.toString());
@@ -448,9 +447,10 @@ public class ExampleService extends Service {
                 Log.d("time",String.valueOf(old==null));
                 if(old!=null)Log.d("time",String.valueOf(old));
                 pref.edit().putString(discoveredEndpointInfo.getEndpointName(),String.valueOf(dt)).apply();
-                //pref.edit().apply();
-                DatabaseReference newRef = database.getReference(discoverer_endpoint).push();
-                newRef.setValue(pair);
+
+                DatabaseReference newRef = database.getReference(discoverer_endpoint);
+                DatabaseReference nRef = newRef.push();
+                nRef.setValue(pair);
                 //DatabaseReference n = myRef.getRef(discoveredEndpointInfo.getEndpointName());
 
             }
@@ -460,18 +460,12 @@ public class ExampleService extends Service {
 
         @Override
         public void onEndpointLost(@NonNull String s) {
-            //do something
-            //forget the endpoint
-            Log.d("end_point_lost","I also visit this function");
-            //Log.d("end_point_lost",s);
+            Log.d("end_point_lost","Endpoint Lost");
         }
     };
 
     private void startDiscovery() {
-
-        //Toast.makeText(this,"Discovering",Toast.LENGTH_SHORT).show();
-        var = this;
-
+        var = this; // store context
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
         Nearby.getConnectionsClient(this)
@@ -494,229 +488,5 @@ public class ExampleService extends Service {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /** Our handler to Nearby Connections. */
-    private ConnectionsClient mConnectionsClient;
-
-    /** The devices we've discovered near us. */
-    private final Map<String, Endpoint> mDiscoveredEndpoints = new HashMap<>();
-
-    private final Map<String, Endpoint> mPendingConnections = new HashMap<>();
-
-    /**
-     * The devices we are currently connected to. For advertisers, this may be large. For discoverers,
-     * there will only be one entry in this map.
-     */
-    private final Map<String, Endpoint> mEstablishedConnections = new HashMap<>();
-
-    /**
-     * True if we are asking a discovered device to connect to us. While we ask, we cannot ask another
-     * device.
-     */
-    private boolean mIsConnecting = false;
-
-    /** True if we are discovering. */
-    private boolean mIsDiscovering = false;
-
-    /** True if we are advertising. */
-    private boolean mIsAdvertising = false;
-
-    /** Callbacks for connections to other devices. */
-    private final ConnectionLifecycleCallback mConnectionLifecycleCallback =
-            new ConnectionLifecycleCallback() {
-                @Override
-                public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
-                    Endpoint endpoint = new Endpoint(endpointId, connectionInfo.getEndpointName());
-                    mPendingConnections.put(endpointId, endpoint);
-                    ExampleService.this.onConnectionInitiated(endpoint, connectionInfo);
-                }
-                //Functions below are not needed as we won't be connecting anyways.
-                @Override
-                public void onConnectionResult(String endpointId, ConnectionResolution result) { }
-
-                @Override
-                public void onDisconnected(String endpointId) { }
-            };
-
-    protected void startAdvertising() {
-        mIsAdvertising = true;
-        final String localEndpointName = getName();
-
-        AdvertisingOptions.Builder advertisingOptions = new AdvertisingOptions.Builder();
-        advertisingOptions.setStrategy(getStrategy());
-
-        mConnectionsClient
-                .startAdvertising(
-                        localEndpointName,
-                        getServiceId(),
-                        mConnectionLifecycleCallback,
-                        advertisingOptions.build())
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unusedResult) { }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                mIsAdvertising = false;
-                            }
-                        });
-    }
-
-    protected void onConnectionInitiated(Endpoint endpoint, ConnectionInfo connectionInfo) {
-    }
-
-    protected void startDiscovering() {
-        mIsDiscovering = true;
-        mDiscoveredEndpoints.clear();
-        DiscoveryOptions.Builder discoveryOptions = new DiscoveryOptions.Builder();
-        discoveryOptions.setStrategy(getStrategy());
-        mConnectionsClient
-                .startDiscovery(
-                        getServiceId(),
-                        new EndpointDiscoveryCallback() {
-                            @Override
-                            public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
-                                if (getServiceId().equals(info.getServiceId())) {
-                                    Endpoint endpoint = new Endpoint(endpointId, info.getEndpointName());
-                                    mDiscoveredEndpoints.put(endpointId, endpoint);
-                                    onEndpointDiscovered(endpoint);
-                                }
-                            }
-
-                            @Override
-                            public void onEndpointLost(String endpointId) { }
-                        },
-                        discoveryOptions.build())
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unusedResult) { }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                mIsDiscovering = false;
-                            }
-                        });
-    }
-
-    protected void onEndpointDiscovered(Endpoint endpoint) {
-
-        Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && var.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)!=PackageManager.PERMISSION_GRANTED)
-        {
-            Toast.makeText(var,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
-        }
-        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
-        String imei = pref.getString("imei","");
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(imei);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss");
-        String dt = sdf.format(new Date());
-
-        Pair<String,Endpoint> pair = new Pair<>(dt,endpoint);
-
-        DatabaseReference newRef = myRef.push();
-        newRef.setValue(pair);
-    }
-
-    /** Resets and clears all state in Nearby Connections. */
-    protected void stopAllEndpoints() {
-        mConnectionsClient.stopAllEndpoints();
-        mIsAdvertising = false;
-        mIsDiscovering = false;
-        mIsConnecting = false;
-        mDiscoveredEndpoints.clear();
-        mPendingConnections.clear();
-        mEstablishedConnections.clear();
-    }
-
-    /** Returns a list of currently connected endpoints. */
-    protected Set<Endpoint> getDiscoveredEndpoints() {
-        return new HashSet<>(mDiscoveredEndpoints.values());
-    }
-
-    protected String getName(){
-        return "Chinmay Garg";
-        //TODO: take name as input from user, store in a shared pref and return here.
-    }
-
-    protected String getServiceId(){
-        return "com.jpg.coronatracker";
-    }
-
-    protected Strategy getStrategy(){
-        return Strategy.P2P_CLUSTER;
-    }
-
-
-    /** Represents a device we can talk to. */
-    protected class Endpoint {
-        //we can manipulate this class so that it has only mobile number and maybe timestamp.
-        @NonNull private final String id;
-        @NonNull private final String name;
-        @NonNull private String mob;
-        private String imei;
-
-        private Endpoint(@NonNull String id, @NonNull String name) {
-            this.id = id;
-            this.name = name;
-            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
-            this.imei = pref.getString("imei", null);
-        }
-
-        @NonNull
-        public String getId() {
-            return id;
-        }
-
-        @NonNull
-        public String getName() {
-            return name;
-        }
-
-        @NonNull
-        public String getMob() { return mob; }
-
-        public String getImei(){ return imei; }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Endpoint) {
-                Endpoint other = (Endpoint) obj;
-                return id.equals(other.id);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return id.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Endpoint{id=%s, name=%s, mobile_no=%s, imei=%s}", id, name, mob, imei);
-        }
-    }
 
 }
