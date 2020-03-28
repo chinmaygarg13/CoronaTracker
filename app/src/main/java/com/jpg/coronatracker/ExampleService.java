@@ -23,6 +23,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
+import android.renderscript.Sampler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
@@ -51,8 +52,13 @@ import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.core.ValueEventRegistration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -144,7 +150,7 @@ public class ExampleService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
+        //String input = intent.getStringExtra("inputExtra");
 
         Log.d("service","Service has started successfully");
         //Toast.makeText(this, "yaha to aa raha hai.....", Toast.LENGTH_LONG).show();
@@ -305,56 +311,100 @@ public class ExampleService extends Service {
             discoverer_endpoint = tMgr.getDeviceId();
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference(discoverer_endpoint);
-            String my_degree = myRef.equalTo("degree_infected").toString();
+            DatabaseReference myRef = database.getReference(discoverer_endpoint+"/degree_infected");
 
-            if(my_degree=="2")
-            {
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                mBuilder.setSmallIcon(R.drawable.ic_android);
-                mBuilder.setContentTitle("YOU ARE IN DANGER");
-                mBuilder.setContentText("PLEASE GET YOURSELF CHECKED");
 
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(1,mBuilder.build());
-            }
-            else if(my_degree=="3")
-            {
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                mBuilder.setSmallIcon(R.drawable.ic_android);
-                mBuilder.setContentTitle("YOU ARE IN DANGER");
-                mBuilder.setContentText("PLEASE GET YOURSELF QUARANTINED");
 
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(1,mBuilder.build());
-            }
+//            String my_degree = myRef.equalTo("degree_infected").toString();
+
+Log.d("db","predb on discovery");
+
+
+            ValueEventListener valueEventListener2 = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String my_degree = dataSnapshot.getValue().toString();
+                    Log.d("readdb",my_degree);
+                    if(my_degree=="2")
+                    {
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                        mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setContentTitle("YOU ARE IN DANGER");
+                        mBuilder.setContentText("PLEASE GET YOURSELF CHECKED");
+
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(1,mBuilder.build());
+                    }
+                    else if(my_degree=="3")
+                    {
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                        mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setContentTitle("YOU ARE IN DANGER");
+                        mBuilder.setContentText("PLEASE GET YOURSELF QUARANTINED");
+
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(1,mBuilder.build());
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            myRef.addValueEventListener(valueEventListener2);
+            myRef.removeEventListener(valueEventListener2);
+            Log.d("db","post first db on discovery");
 
             DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName());
-            DatabaseReference hisStatusRef = hisRef;
 
-            String degree_infected = hisStatusRef.equalTo("degree_infected").toString();
 
-            if(degree_infected=="2"||degree_infected=="1")
-            {
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                mBuilder.setSmallIcon(R.drawable.ic_android);
-                mBuilder.setContentTitle("YOU ARE IN DANGER");
-                if(degree_infected=="1")
-                {
-                    mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
+
+            ValueEventListener valueEventListener = new ValueEventListener() {
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.d("service","here");
+                    String degree_infected = dataSnapshot.getValue().toString();
+                    Log.d("readdb",degree_infected);
+
+                    if (degree_infected == "2" || degree_infected == "1") {
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                        mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setContentTitle("YOU ARE IN DANGER");
+                        if (degree_infected == "1") {
+                            mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
+                        } else {
+                            mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
+                        }
+
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(1, mBuilder.build());
+                        //unregisterReceiver(mReceiver);
+                    }
                 }
-                else
-                {
-                    mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
+            };
 
-                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(1,mBuilder.build());
-            }
+            hisRef.addValueEventListener(valueEventListener);
+            hisRef.removeEventListener(valueEventListener);
 
+            Log.d("db","post 2nd db on discovery");
+            //String degree_infected = hisStatusRef.equalTo("degree_infected").toString();
+            //Log.d("degree",degree_infected);
+
+            //TODO: UPDATE MY DEGREE ALSO
+
+            Log.d("endpoint_discovered","I have reached 362.");
             //TODO: This line maybe redundant
             myRef.keepSynced(true);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             String dt = sdf.format(new Date());
             Pair<String,String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
             Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
@@ -375,7 +425,7 @@ public class ExampleService extends Service {
                 //compute the difference
                 Log.d("time",old_date);
                 try {
-                    old = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss").parse((String) old_date);
+                    old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse((String) old_date);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
