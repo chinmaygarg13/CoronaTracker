@@ -334,6 +334,7 @@ public class ExampleService extends Service {
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setChannelId(CHANNEL_ID);
                         mBuilder.setContentTitle("YOU ARE IN DANGER");
                         mBuilder.setContentText("PLEASE GET YOURSELF CHECKED");
 
@@ -347,8 +348,9 @@ public class ExampleService extends Service {
                         mBuilder.setContentTitle("YOU ARE IN DANGER");
                         mBuilder.setContentText("PLEASE GET YOURSELF QUARANTINED");
 
+
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.notify(1,mBuilder.build());
+                        mNotificationManager.notify(8, mBuilder.build());
                     }
                 }
 
@@ -379,14 +381,16 @@ public class ExampleService extends Service {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.ic_android);
                         mBuilder.setContentTitle("YOU ARE IN DANGER");
+                        mBuilder.setChannelId(CHANNEL_ID);
                         if (degree_infected.equals("1")) {
+                            Log.d("db","you");
                             mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
                         } else {
                             mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
                         }
 
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.notify(1, mBuilder.build());
+                        mNotificationManager.notify(8, mBuilder.build());
                         //unregisterReceiver(mReceiver);
                     }
                 }
