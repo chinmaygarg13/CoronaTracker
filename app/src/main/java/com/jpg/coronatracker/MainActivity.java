@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         b_enter.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
                 String name = et_name.getText().toString();
@@ -80,7 +81,13 @@ public class MainActivity extends AppCompatActivity {
 
                 TelephonyManager tMgr = (TelephonyManager) MainActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
 
-                @SuppressLint("MissingPermission") String imei = tMgr.getImei();
+                String imei = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    imei = tMgr.getImei();
+                }
+                else{
+                    imei = tMgr.getDeviceId();
+                }
 
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -192,14 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     public void startService(View v) {
-        String input;
-
-        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        input = tMgr.getDeviceId();
-
         Intent serviceIntent = new Intent(this, ExampleService.class);
-        serviceIntent.putExtra("inputExtra", input);
-
         ContextCompat.startForegroundService(this, serviceIntent);
         minimizeApp();
     }

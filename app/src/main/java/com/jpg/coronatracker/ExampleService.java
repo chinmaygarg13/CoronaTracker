@@ -154,7 +154,6 @@ public class ExampleService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //String input = intent.getStringExtra("inputExtra");
-
         Log.d("service","Service has started successfully");
         //Toast.makeText(this, "yaha to aa raha hai.....", Toast.LENGTH_LONG).show();
 
@@ -274,26 +273,6 @@ public class ExampleService extends Service {
     }
 
 
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                    stopSelf();
-//                    Toast.makeText()
-//            }
-//        },5000);
-
-
-        //stopSelf();
-
-
-//                        getUserNickname(), SERVICE_ID, connectionLifecycleCallback, advertisingOptions)
-//                .addOnSuccessListener(
-//                        (Void unused) -> {
-                            // We're advertising!
-//                        })
-//                .addOnFailureListener(
-//                        (Exception e) -> {
-//                            // We were unable to start advertising.
     private Context var;
 
     private EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
@@ -327,8 +306,12 @@ public class ExampleService extends Service {
 
                         //
                     }
-                    //Log.d("db",my_degree);
-                    my_degree = dataSnapshot.getValue().toString();
+                    if(dataSnapshot.getValue() == null) {
+                        Log.d("db", "no value in degree");
+                        my_degree = "4";
+                    }
+                    else
+                        my_degree = dataSnapshot.getValue().toString();
                     Log.d("db",my_degree);
                     if(my_degree=="2")
                     {
@@ -363,17 +346,17 @@ public class ExampleService extends Service {
             //myRef.removeEventListener(valueEventListener2);
             Log.d("db","post first db on discovery");
 
-
-
-
-
             DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName()+"/degree_infected");
             ValueEventListener valueEventListener = new ValueEventListener() {
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Log.d("service","here");
-                    String degree_infected = dataSnapshot.getValue().toString();
+                    String degree_infected;
+                    if(dataSnapshot.getValue() == null)
+                        degree_infected = "4";
+                    else
+                        degree_infected = dataSnapshot.getValue().toString();
                     Log.d("readdb",degree_infected);
 
                     if (degree_infected.equals("2") || degree_infected.equals("1")) {
@@ -428,29 +411,26 @@ public class ExampleService extends Service {
             String old_d = pref.getString(discoveredEndpointInfo.getEndpointName(), null);
 
             Long old_date = null;
-            if(old_date!=null)
-            old_date = Long.parseLong(old_d);
+            if(old_d!=null)
+                old_date = Long.parseLong(old_d);
 
             Log.d("time","DATE");
             Long current_date = new Date().getTime();
             //Date current_date = new Date();//Current date time
             Long diff = new Date().getTime();
-            //Date diff = new Date();//initialize difference
-            Long old = null;
-            //Date old=null;
+
             if(old_date!=null) {
                 //compute the difference
                 Log.d("time",old_date.toString());
-                diff = new Date(current_date- old).getTime();
+                diff = new Date(current_date- old_date).getTime();
                 Log.d("time","Reached difference calculator");
                 Log.d("time",diff.toString());
             }
-            if(old==null || diff>T)
+            if(old_date==null || diff>T)
             {
                 Log.d("time","writing");
-                Log.d("time",String.valueOf(old==null));
-                if(old!=null)Log.d("time",String.valueOf(old));
                 pref.edit().putString(discoveredEndpointInfo.getEndpointName(),String.valueOf(dt)).apply();
+                Log.d("time stored", String.valueOf(dt));
 
                 DatabaseReference newRef = database.getReference(discoverer_endpoint);
                 DatabaseReference nRef = newRef.push();
