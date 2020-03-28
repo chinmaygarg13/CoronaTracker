@@ -131,8 +131,6 @@ public class ExampleService extends Service {
                     newRef.child("longitude").setValue(location.getLongitude());
                     newRef.child("altitude").setValue(location.getAltitude());
 
-
-
                     Log.d("location",location.toString());
 
                 }
@@ -208,11 +206,7 @@ public class ExampleService extends Service {
     private ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(@NonNull String s, @NonNull ConnectionInfo connectionInfo) {
-            //do something
-            //Toast.makeText(this,"Nearby working atleast",Toast.LENGTH_SHORT).show();
-            //Toast.makeText(this,"",Toast.LENGTH_SHORT);
             Nearby.getConnectionsClient(ExampleService.this).disconnectFromEndpoint(s);
-            //Toast.makeText(ExampleService.this,s,Toast.LENGTH_LONG).show();
             Log.d("service","in OnConnection Initiated");
             Log.d("service",String.valueOf(connectionInfo));
             System.out.println("HELLO");
@@ -306,7 +300,6 @@ public class ExampleService extends Service {
             {
                 Toast.makeText(var,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
             }
-
 
             TelephonyManager tMgr = (TelephonyManager) var.getSystemService(Context.TELEPHONY_SERVICE);
             discoverer_endpoint = tMgr.getDeviceId();

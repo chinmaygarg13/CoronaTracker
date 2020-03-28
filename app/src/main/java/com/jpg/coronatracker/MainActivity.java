@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,6 +46,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Boolean ft = pref.getBoolean("first_time", true);
+
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.BLUETOOTH_ADMIN);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_WIFI_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.CHANGE_WIFI_STATE);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_STATE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            REQUIRED_PERMISSIONS.add(Manifest.permission.READ_PHONE_NUMBERS);
+
+        }
 
         final EditText et_name = findViewById(R.id.name);
         final EditText et_phone = findViewById(R.id.phone);
@@ -63,19 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 TelephonyManager tMgr = (TelephonyManager) MainActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                String imei = tMgr.getDeviceId();
 
-
+                @SuppressLint("MissingPermission") String imei = tMgr.getDeviceId();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference(imei);
@@ -109,18 +114,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-        private static final String[] REQUIRED_PERMISSIONS =
-            new String[]{
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN,
-                    Manifest.permission.ACCESS_WIFI_STATE,
-                    Manifest.permission.CHANGE_WIFI_STATE,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.READ_PHONE_NUMBERS,
-        };
+    private List<String> REQUIRED_PERMISSIONS = new ArrayList<String>();
+//    private static final String[] REQUIRED_PERMISSIONS =
+//        new String[]{
+//                Manifest.permission.BLUETOOTH,
+//                Manifest.permission.BLUETOOTH_ADMIN,
+//                Manifest.permission.ACCESS_WIFI_STATE,
+//                Manifest.permission.CHANGE_WIFI_STATE,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.READ_PHONE_STATE,
+//                Manifest.permission.READ_PHONE_NUMBERS,
+//    };
 
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
 
@@ -144,13 +149,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        int i = 0;
         if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
             for (int grantResult : grantResults) {
                 if (grantResult == PackageManager.PERMISSION_DENIED) {
+                    Log.d("permission", permissions[i]);
                     Toast.makeText(this, "Missing Permissions.", Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
+                i += 1;
             }
             recreate();
         }
@@ -158,7 +166,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected String[] getRequiredPermissions() {
-        return REQUIRED_PERMISSIONS;
+        String[] temp =  new String[REQUIRED_PERMISSIONS.size()];
+        REQUIRED_PERMISSIONS.toArray(temp);
+        return temp;
     }
 
     public static boolean hasPermissions(Context context, String... permissions) {
