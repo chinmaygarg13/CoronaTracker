@@ -280,7 +280,7 @@ public class ExampleService extends Service {
         @Override
         public void onEndpointFound(@NonNull String s, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo) {
             //let's write to firebase now
-            String discoverer_endpoint;
+            final String discoverer_endpoint;
             Log.d("endpoint_found","in onEndpointFound");
             Log.d("endpoint_found",s);
             Log.d("endpoint_found",discoveredEndpointInfo.getEndpointName());
@@ -313,8 +313,11 @@ public class ExampleService extends Service {
                         Log.d("db", "no value in degree");
                         my_degree = "4";
                     }
-                    else
+                    else {
                         my_degree = dataSnapshot.getValue().toString();
+                        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+                        pref.edit().putString("degree_infected",my_degree).apply();
+                    }
                     Log.d("db",my_degree);
                     if(my_degree=="2")
                     {
@@ -454,7 +457,20 @@ public class ExampleService extends Service {
                     if(dataSnapshot.getValue() == null)
                         degree_infected = "4";
                     else
+                    {
                         degree_infected = dataSnapshot.getValue().toString();
+                        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+                        Integer my_current_degree = Integer.parseInt(pref.getString("degree_infected","4"));
+                        int neighbor_degree = Integer.parseInt(degree_infected);
+                        if(neighbor_degree+1<my_current_degree)
+                        {
+                            my_current_degree = neighbor_degree+1;
+                            pref.edit().putString("degree_infected",my_current_degree.toString()).apply();
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference hisRef = database.getReference(discoverer_endpoint+"/degree_infected");
+                            hisRef.setValue(my_current_degree.toString());
+                        }
+                    }
                     Log.d("readdb",degree_infected);
 
                     if (degree_infected.equals("2") || degree_infected.equals("1")) {
@@ -470,7 +486,9 @@ public class ExampleService extends Service {
                         } else {
                             mBuilder.setContentText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP.");
                             SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
-                            Date ts = new Date(Long.parseLong(pref.getString("infected_since",null)));
+                            //Date ts = new Date(Long.parseLong(pref.getString("infected_since",String.valueOf((new Date(0l)).getTime()))));
+                            Date d = new Date();
+                            Date ts = new Date(Long.parseLong(pref.getString("infected_since",String.valueOf(d.getTime()))));
                             mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with a person who was previously in vicinity of an infected individual. at "+ts.toString()+" Seek quarantine ASAP."));
 
                         }
