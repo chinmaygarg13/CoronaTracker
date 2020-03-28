@@ -316,8 +316,17 @@ public class ExampleService extends Service {
             ValueEventListener valueEventListener2 = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    String my_degree=null;
+                    Log.d("db","inside on datachange");
+                    if(dataSnapshot.getValue()==null) {
+                        //Log.d("db", dataSnapshot.getValue().toString());
+                       Log.d("db","I am here");
+
+                        //
+                    }
+
                     String my_degree = dataSnapshot.getValue().toString();
-                    Log.d("readdb",my_degree);
                     if(my_degree=="2")
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
@@ -346,7 +355,7 @@ public class ExampleService extends Service {
                 }
             };
             myRef.addValueEventListener(valueEventListener2);
-            myRef.removeEventListener(valueEventListener2);
+            //myRef.removeEventListener(valueEventListener2);
             Log.d("db","post first db on discovery");
 
             DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName());
@@ -384,46 +393,56 @@ public class ExampleService extends Service {
             };
 
             hisRef.addValueEventListener(valueEventListener);
-            hisRef.removeEventListener(valueEventListener);
+            //hisRef.removeEventListener(valueEventListener);
 
             Log.d("db","post 2nd db on discovery");
             //String degree_infected = hisStatusRef.equalTo("degree_infected").toString();
             //Log.d("degree",degree_infected);
 
-            //TODO: UPDATE MY DEGREE ALSO
-
             Log.d("endpoint_discovered","I have reached 362.");
             //TODO: This line maybe redundant
             myRef.keepSynced(true);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String dt = sdf.format(new Date());
-            Pair<String,String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
+            //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            //String dt = sdf.format(new Date());
+
+            Long dt = new Date().getTime();
+
+            Pair<Long, String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
             Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
             Log.d("endpoint_discovered","DISCOVERED");
             Log.d("endpoint_discovered",discoveredEndpointInfo.getEndpointName());
-            Log.d("endpoint_discovered",dt);
+            Log.d("endpoint_discovered",dt.toString());
 
             Log.d("time",String.valueOf(pref.getAll()));
-            final Date T = new Date((new Date(System.currentTimeMillis()+5*60*1000)).getTime()-(new Date()).getTime());
-            String old_date = pref.getString(discoveredEndpointInfo.getEndpointName(), null);
+            //final Date T = new Date();
+            final Long T = new Date((new Date(System.currentTimeMillis()+5*60*1000)).getTime()-(new Date()).getTime()).getTime();
+            String old_d = pref.getString(discoveredEndpointInfo.getEndpointName(), null);
+
+            Long old_date = null;
+            if(old_date!=null)
+            old_date = Long.parseLong(old_d);
+
             Log.d("time","DATE");
-            Date current_date = new Date();//Current date time
-            Date diff = new Date();//initialize difference
-            Date old=null;
+            Long current_date = new Date().getTime();
+            //Date current_date = new Date();//Current date time
+            Long diff = new Date().getTime();
+            //Date diff = new Date();//initialize difference
+            Long old = null;
+            //Date old=null;
             if(old_date!=null) {
                 //compute the difference
-                Log.d("time",old_date);
-                try {
-                    old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse((String) old_date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                Log.d("time",old_date.toString());
+//                try {
+//                    old = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse((String) old_date);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
 
-                diff = new Date(current_date.getTime() - old.getTime());
+                diff = new Date(current_date- old).getTime();
                 Log.d("time","Reached difference calculator");
-                Log.d("time",String.valueOf(diff));
+                Log.d("time",diff.toString());
             }
-            if(old==null || diff.getTime()>T.getTime())
+            if(old==null || diff>T)
             {
                 Log.d("time","writing");
                 Log.d("time",String.valueOf(old==null));
