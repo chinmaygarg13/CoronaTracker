@@ -363,14 +363,21 @@ public class ExampleService extends Service {
                         Log.d("db","Reaching inside, hence string");
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.ic_android);
-                        mBuilder.setContentTitle("YOU ARE IN DANGER");
+                        mBuilder.setContentTitle("YOU ARE AT RISK");
                         mBuilder.setChannelId(CHANNEL_ID);
                         if (degree_infected.equals("1")) {
                             Log.d("db","you");
-                            mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
+                            mBuilder.setContentText("You have come in contact with an infected individual. Tap here to know more.");
+                            mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with an infected individual. Kindly schedule a test."));
                         } else {
-                            mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
+                            mBuilder.setContentText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP.");
+                            mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP."));
+
                         }
+                        Intent intent = new Intent(var, OnNotifTapActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(var, 0, intent, 0);
+                        mBuilder.setContentIntent(pendingIntent);
 
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotificationManager.notify(8, mBuilder.build());
