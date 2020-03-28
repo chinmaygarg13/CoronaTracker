@@ -4,6 +4,8 @@ package com.jpg.coronatracker;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -83,7 +85,7 @@ public class ExampleService extends Service {
     private Location mCurrentLocation;
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
-
+    private String imei_number;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -118,6 +120,19 @@ public class ExampleService extends Service {
                     /**TODO- send location to firebase. For timestamp, do not use location.getTime().
                      For latitude: location.getLatitude, longitude: location.getLongitude.
                      For accuracy: location.getAccuracy (it will be used later to draw circle)**/
+                    TelephonyManager tMgr = (TelephonyManager) ExampleService.this.getSystemService(Context.TELEPHONY_SERVICE);
+                    String endPoint = tMgr.getDeviceId();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference(endPoint);
+
+                    DatabaseReference newRef = myRef.child("location_track").push();
+                    newRef.child("location").setValue(location.getLatitude());
+                    newRef.child("accuracy").setValue(location.getAccuracy());
+                    newRef.child("longitude").setValue(location.getLongitude());
+                    newRef.child("altitude").setValue(location.getAltitude());
+
+
+
                     Log.d("location",location.toString());
 
                 }
@@ -298,12 +313,57 @@ public class ExampleService extends Service {
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(discoverer_endpoint);
+            String my_degree = myRef.equalTo("degree_infected").toString();
+
+            if(my_degree=="2")
+            {
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                mBuilder.setSmallIcon(R.drawable.ic_android);
+                mBuilder.setContentTitle("YOU ARE IN DANGER");
+                mBuilder.setContentText("PLEASE GET YOURSELF CHECKED");
+
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1,mBuilder.build());
+            }
+            else if(my_degree=="3")
+            {
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                mBuilder.setSmallIcon(R.drawable.ic_android);
+                mBuilder.setContentTitle("YOU ARE IN DANGER");
+                mBuilder.setContentText("PLEASE GET YOURSELF QUARANTINED");
+
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1,mBuilder.build());
+            }
+
+            DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName());
+            DatabaseReference hisStatusRef = hisRef;
+
+            String degree_infected = hisStatusRef.equalTo("degree_infected").toString();
+
+            if(degree_infected=="2"||degree_infected=="1")
+            {
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
+                mBuilder.setSmallIcon(R.drawable.ic_android);
+                mBuilder.setContentTitle("YOU ARE IN DANGER");
+                if(degree_infected=="1")
+                {
+                    mBuilder.setContentText("You have come in contact with a degree 1 individual. Kindly schedule a test");
+                }
+                else
+                {
+                    mBuilder.setContentText("You have come in contact with a degree 2 individual. Seek quarantine asap.");
+                }
+
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1,mBuilder.build());
+            }
+
+            //TODO: This line maybe redundant
             myRef.keepSynced(true);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss");
             String dt = sdf.format(new Date());
-
             Pair<String,String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
-
             Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
             Log.d("endpoint_discovered","DISCOVERED");
             Log.d("endpoint_discovered",discoveredEndpointInfo.getEndpointName());
@@ -322,7 +382,7 @@ public class ExampleService extends Service {
                 //compute the difference
                 Log.d("time",old_date);
                 try {
-                    old = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss").parse((String) old_date);
+                    old = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss").parse((String) old_date);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -575,7 +635,7 @@ public class ExampleService extends Service {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference(emei);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy:hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss");
         String dt = sdf.format(new Date());
 
         Pair<String,Endpoint> pair = new Pair<>(dt,endpoint);

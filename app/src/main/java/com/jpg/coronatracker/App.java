@@ -15,7 +15,7 @@ public class App extends Application {
     @Override
     public void onCreate()
     {
-        super.onCreate();;
+        super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             createNotificationChannel();
         }
@@ -26,9 +26,7 @@ public class App extends Application {
     public void createNotificationChannel()
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Example Service Channel", NotificationManager.IMPORTANCE_DEFAULT);
-
-
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Corona Tracker", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
