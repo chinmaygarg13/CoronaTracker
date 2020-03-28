@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 pref.edit().putString("name", name).apply();
                 pref.edit().putString("phone", phone).apply();
                 pref.edit().putBoolean("first_time", false).apply();
+                pref.edit().putString("imei", imei).apply();
 
                 b_enter.setVisibility(View.GONE);
                 et_name.setVisibility(View.GONE);
@@ -194,9 +195,6 @@ public class MainActivity extends AppCompatActivity {
 
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         input = tMgr.getDeviceId();
-
-        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
-        pref.edit().putString("emei", input).apply();
 
         Intent serviceIntent = new Intent(this, ExampleService.class);
         serviceIntent.putExtra("inputExtra", input);

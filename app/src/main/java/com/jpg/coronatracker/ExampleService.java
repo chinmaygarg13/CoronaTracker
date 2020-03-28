@@ -126,16 +126,18 @@ public class ExampleService extends Service {
                     /**TODO- send location to firebase. For timestamp, do not use location.getTime().
                      For latitude: location.getLatitude, longitude: location.getLongitude.
                      For accuracy: location.getAccuracy (it will be used later to draw circle)**/
-                    TelephonyManager tMgr = (TelephonyManager) ExampleService.this.getSystemService(Context.TELEPHONY_SERVICE);
-                    String endPoint = tMgr.getDeviceId();
+                    SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+                    String endPoint = pref.getString("imei","");
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference(endPoint);
-
                     DatabaseReference newRef = myRef.child("location_track").push();
                     newRef.child("location").setValue(location.getLatitude());
                     newRef.child("accuracy").setValue(location.getAccuracy());
                     newRef.child("longitude").setValue(location.getLongitude());
                     newRef.child("altitude").setValue(location.getAltitude());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    String dt = sdf.format(new Date());
+                    newRef.child("dateTime").setValue(dt);
 
                     Log.d("location",location.toString());
 
@@ -253,8 +255,8 @@ public class ExampleService extends Service {
             Toast.makeText(this,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
         }
 
-        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        String endPoint = tMgr.getDeviceId();
+        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+        String endPoint = pref.getString("imei", "");
 
 
         adv = this;
@@ -302,23 +304,14 @@ public class ExampleService extends Service {
             Log.d("endpoint_found",s);
             Log.d("endpoint_found",discoveredEndpointInfo.getEndpointName());
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && var.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)!=PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(var,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
-            }
-
-            TelephonyManager tMgr = (TelephonyManager) var.getSystemService(Context.TELEPHONY_SERVICE);
-            discoverer_endpoint = tMgr.getDeviceId();
+            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+            discoverer_endpoint = pref.getString("imei","");
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(discoverer_endpoint+"/degree_infected");
+//          String my_degree = myRef.equalTo("degree_infected").toString();
 
-
-
-//            String my_degree = myRef.equalTo("degree_infected").toString();
-
-Log.d("db","predb on discovery");
-
+            Log.d("db","predb on discovery");
 
             ValueEventListener valueEventListener2 = new ValueEventListener() {
                 @Override
@@ -345,8 +338,6 @@ Log.d("db","predb on discovery");
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotificationManager.notify(1,mBuilder.build());
                     }
-
-
                 }
 
                 @Override
@@ -411,8 +402,6 @@ Log.d("db","predb on discovery");
             Log.d("endpoint_discovered","DISCOVERED");
             Log.d("endpoint_discovered",discoveredEndpointInfo.getEndpointName());
             Log.d("endpoint_discovered",dt);
-
-            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
 
             Log.d("time",String.valueOf(pref.getAll()));
             final Date T = new Date((new Date(System.currentTimeMillis()+5*60*1000)).getTime()-(new Date()).getTime());
@@ -498,65 +487,7 @@ Log.d("db","predb on discovery");
 
 
 
-//    private static final String[] REQUIRED_PERMISSIONS =
-//            new String[]{
-//                    Manifest.permission.BLUETOOTH,
-//                    Manifest.permission.BLUETOOTH_ADMIN,
-//                    Manifest.permission.ACCESS_WIFI_STATE,
-//                    Manifest.permission.CHANGE_WIFI_STATE,
-//                    Manifest.permission.ACCESS_COARSE_LOCATION,
-//                    Manifest.permission.READ_PHONE_STATE,
-//                    Manifest.permission.READ_PHONE_NUMBERS
-//            };
-//
-//    private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
-//
-//    /** Called when our Activity has been made visible to the user. */
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        //ye get permission wala part tu chahe to mainactivity mai bhi daal de.
-//        if (!hasPermissions(this, getRequiredPermissions())) {
-//            if (Build.VERSION.SDK_INT < 23) {
-//                ActivityCompat.requestPermissions(
-//                        this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-//            } else {
-//                requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-//            }
-//        }
-//    }
-//
-//    /** Called when the user has accepted (or denied) our permission request. */
-//    @CallSuper
-//    @Override
-//    public void onRequestPermissionsResult(
-//            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
-//            for (int grantResult : grantResults) {
-//                if (grantResult == PackageManager.PERMISSION_DENIED) {
-//                    Toast.makeText(this, "Missing Permissions.", Toast.LENGTH_LONG).show();
-//                    finish();
-//                    return;
-//                }
-//            }
-//            recreate();
-//        }
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//    }
-//
-//    protected String[] getRequiredPermissions() {
-//        return REQUIRED_PERMISSIONS;
-//    }
-//
-//    public static boolean hasPermissions(Context context, String... permissions) {
-//        for (String permission : permissions) {
-//            if (ContextCompat.checkSelfPermission(context, permission)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
+
 
     /** Our handler to Nearby Connections. */
     private ConnectionsClient mConnectionsClient;
@@ -675,11 +606,11 @@ Log.d("db","predb on discovery");
         {
             Toast.makeText(var,"Please grant Permission to access your phone number", Toast.LENGTH_SHORT).show();
         }
-        TelephonyManager tMgr = (TelephonyManager) var.getSystemService(Context.TELEPHONY_SERVICE);
-        String emei = tMgr.getDeviceId();
+        SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+        String imei = pref.getString("imei","");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(emei);
+        DatabaseReference myRef = database.getReference(imei);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss");
         String dt = sdf.format(new Date());
 
@@ -725,13 +656,13 @@ Log.d("db","predb on discovery");
         @NonNull private final String id;
         @NonNull private final String name;
         @NonNull private String mob;
-        private String emei;
+        private String imei;
 
         private Endpoint(@NonNull String id, @NonNull String name) {
             this.id = id;
             this.name = name;
             SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
-            this.emei = pref.getString("emei", null);
+            this.imei = pref.getString("imei", null);
         }
 
         @NonNull
@@ -747,7 +678,7 @@ Log.d("db","predb on discovery");
         @NonNull
         public String getMob() { return mob; }
 
-        public String getEmei(){ return emei; }
+        public String getImei(){ return imei; }
 
         @Override
         public boolean equals(Object obj) {
@@ -765,7 +696,7 @@ Log.d("db","predb on discovery");
 
         @Override
         public String toString() {
-            return String.format("Endpoint{id=%s, name=%s, mobile_no=%s, emei=%s}", id, name, mob, emei);
+            return String.format("Endpoint{id=%s, name=%s, mobile_no=%s, imei=%s}", id, name, mob, imei);
         }
     }
 
