@@ -441,9 +441,10 @@ Log.d("db","predb on discovery");
                 if(old!=null)Log.d("time",String.valueOf(old));
                 pref.edit().putString(discoveredEndpointInfo.getEndpointName(),String.valueOf(dt)).apply();
                 //pref.edit().apply();
-                DatabaseReference newRef = myRef.push();
-                //DatabaseReference n = myRef.getRef(discoveredEndpointInfo.getEndpointName());
+                DatabaseReference newRef = database.getReference(discoverer_endpoint).push();
                 newRef.setValue(pair);
+                //DatabaseReference n = myRef.getRef(discoveredEndpointInfo.getEndpointName());
+
             }
             Nearby.getConnectionsClient(ExampleService.this).rejectConnection(discoveredEndpointInfo.getEndpointName());
             //Nearby.getConnectionsClient(ExampleService.this).disconnectFromEndpoint(discoveredEndpointInfo.getEndpointName());
@@ -475,6 +476,7 @@ Log.d("db","predb on discovery");
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 
     //@Nullable
