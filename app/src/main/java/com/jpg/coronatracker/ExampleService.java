@@ -70,6 +70,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -288,11 +289,13 @@ public class ExampleService extends Service {
             discoverer_endpoint = pref.getString("imei","");
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             DatabaseReference myRef = database.getReference(discoverer_endpoint+"/degree_infected");
 //          String my_degree = myRef.equalTo("degree_infected").toString();
 
             Log.d("db","predb on discovery");
-
             ValueEventListener valueEventListener2 = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -346,6 +349,101 @@ public class ExampleService extends Service {
             //myRef.removeEventListener(valueEventListener2);
             Log.d("db","post first db on discovery");
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+            DatabaseReference myRef2 = database.getReference(discoverer_endpoint+"/infected_since");
+//          String my_degree = myRef.equalTo("degree_infected").toString();
+
+            //Log.d("db","predb on discovery");
+            ValueEventListener valueEventListener3 = new ValueEventListener() {
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    //String my_degree=null;
+                    Long infected_since=null;
+
+
+                    Log.d("db","inside on datachange");
+//                    if(dataSnapshot.getValue()==null) {
+//                        //Log.d("db", dataSnapshot.getValue().toString());
+//                        Log.d("db","I am here");
+//                        //Log.d("db",dataSnapshot.getKey());
+//
+//                        //
+//                    }
+                    if(dataSnapshot.getValue() == null) {
+                        Log.d("db", "no value in degree");
+                        //my_degree = "4";
+                        infected_since = 0l;
+                    }
+                    else
+                        infected_since = Long.parseLong(dataSnapshot.getValue().toString());
+
+
+                    Log.d("infected_since",infected_since.toString());
+                    SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+                    pref.edit().putString("infected_string",infected_since.toString());
+                    Log.d("db",infected_since.toString());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            };
+            myRef2.addValueEventListener(valueEventListener3);
+            //myRef.removeEventListener(valueEventListener2);
+            Log.d("db","post first db on discovery");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+            //DatabaseReference myRef3 = database.getReference(discoverer_endpoint);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             DatabaseReference hisRef = database.getReference(discoveredEndpointInfo.getEndpointName()+"/degree_infected");
             ValueEventListener valueEventListener = new ValueEventListener() {
 
@@ -371,7 +469,9 @@ public class ExampleService extends Service {
                             mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with an infected individual. Kindly schedule a test."));
                         } else {
                             mBuilder.setContentText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP.");
-                            mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP."));
+                            SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
+                            Date ts = new Date(Long.parseLong(pref.getString("infected_since",null)));
+                            mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with a person who was previously in vicinity of an infected individual. at "+ts.toString()+" Seek quarantine ASAP."));
 
                         }
                         Intent intent = new Intent(var, OnNotifTapActivity.class);
