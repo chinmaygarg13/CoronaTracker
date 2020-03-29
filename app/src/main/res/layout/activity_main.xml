@@ -22,14 +22,26 @@
         app:layout_constraintVertical_bias="0.2"
         android:layout_height = "wrap_content"
         android:layout_width = "wrap_content"
-        android:hint="Enter your name."
+        android:hint="Enter your First Name."
         android:inputType="text"
-        android:id="@+id/name"/>
+        android:id="@+id/name1"/>
 
     <EditText
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name"
+        app:layout_constraintTop_toBottomOf="@id/name1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.05"
+        android:layout_height = "wrap_content"
+        android:layout_width = "wrap_content"
+        android:hint="Enter your Last Name."
+        android:inputType="text"
+        android:id="@+id/name2"/>
+
+    <EditText
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.1"
         android:hint="Enter your mobile number."
@@ -70,7 +82,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintVertical_bias="0.8"
-        android:text="This app may automatically turn off automatically in rare cases to save battery and RAM. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/>
+        android:text="This app may turn off automatically in rare cases to save battery and RAM. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/>
 
 
 <!--<Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Stop Service" android:onClick="stopService"/>-->

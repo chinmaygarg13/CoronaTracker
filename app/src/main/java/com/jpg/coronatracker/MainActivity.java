@@ -59,14 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        final EditText et_name = findViewById(R.id.name);
+        final EditText et_name1 = findViewById(R.id.name1);
+        final EditText et_name2 = findViewById(R.id.name2);
         final EditText et_phone = findViewById(R.id.phone);
         final Button b_enter = findViewById(R.id.enter);
         final Button b_service = findViewById(R.id.service);
 
         if (ft == false) {
             b_enter.setVisibility(View.GONE);
-            et_name.setVisibility(View.GONE);
+            et_name1.setVisibility(View.GONE);
+            et_name2.setVisibility(View.GONE);
             et_phone.setVisibility(View.GONE);
             b_service.setVisibility(View.VISIBLE);
         }
@@ -75,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                String name = et_name.getText().toString();
+                String name = et_name1.getText().toString();
+                name += " " + et_name2.getText().toString();
                 String phone = et_phone.getText().toString();
 
 
@@ -115,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
                 pref.edit().putString("imei", imei).apply();
 
                 b_enter.setVisibility(View.GONE);
-                et_name.setVisibility(View.GONE);
+                et_name1.setVisibility(View.GONE);
+                et_name1.setVisibility(View.GONE);
                 et_phone.setVisibility(View.GONE);
                 b_service.setVisibility(View.VISIBLE);
             }

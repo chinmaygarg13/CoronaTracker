@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.1"
-        android:src="@drawable/high_risk_80"/>
+        android:src="@drawable/medium_risk_80"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/risk"
-        android:text="You have come in contact with a COVID-19 infected person."
+        android:text="You have come in contact with a suspected COVID-19 carrier person."
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:paddingTop="5dp"
@@ -47,7 +47,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/t1"
-        android:text="Warning Level : HIGH"
+        android:text="Warning Level : MODERATE"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:paddingTop="15dp"
