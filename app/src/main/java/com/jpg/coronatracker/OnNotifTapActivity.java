@@ -3,6 +3,7 @@ package com.jpg.coronatracker;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -16,18 +17,20 @@ public class OnNotifTapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
         String degree = pref.getString("degree_infected","3");
-        if(degree == "2")
+        Log.d("notif",degree);
+        if(degree.equals("2"))
             setContentView(R.layout.on_tap);
         else
             setContentView(R.layout.on_tap_medium);
 
         String infString = pref.getString("infected_string","");
-        if(infString != ""){
+        Log.d("notif",String.valueOf(infString.equals("")));
+        if(!infString.equals("")){
             final TextView t = findViewById(R.id.t3);
             Long inf = Long.parseLong(infString);
             Date obj = new Date(inf);
             String input = obj.toString();
-            t.setText(infString);
+            t.setText(input);
         }
 
     }

@@ -32,6 +32,7 @@
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
             android:value="AIzaSyDitsJAmiLA1PAi-QpduV0siE4IoL0kA2o" />
+
         <!--we have to change the value-->
 
         <activity android:name=".MainActivity">

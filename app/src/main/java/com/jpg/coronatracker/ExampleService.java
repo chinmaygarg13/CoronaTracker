@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.icu.util.DateInterval;
 import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -50,6 +51,8 @@ import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -306,8 +309,6 @@ public class ExampleService extends Service {
                         //Log.d("db", dataSnapshot.getValue().toString());
                        Log.d("db","I am here");
                        Log.d("db",dataSnapshot.getKey());
-
-                        //
                     }
                     if(dataSnapshot.getValue() == null) {
                         Log.d("db", "no value in degree");
@@ -318,8 +319,9 @@ public class ExampleService extends Service {
                         SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
                         pref.edit().putString("degree_infected",my_degree).apply();
                     }
-                    Log.d("db",my_degree);
-                    if(my_degree=="2")
+                    Log.d("notif","onMyDegreeChange");
+                    Log.d("notif",my_degree);
+                    if(my_degree.equals("2"))
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.high_risk_16);
@@ -332,9 +334,9 @@ public class ExampleService extends Service {
                         PendingIntent pendingIntent = PendingIntent.getActivity(var, 0, intent, 0);
                         mBuilder.setContentIntent(pendingIntent);
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.notify(1,mBuilder.build());
+                        mNotificationManager.notify(6,mBuilder.build());
                     }
-                    else if(my_degree=="3")
+                    else if(my_degree.equals("3"))
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
                         mBuilder.setSmallIcon(R.drawable.ic_android);
@@ -390,7 +392,7 @@ public class ExampleService extends Service {
 //
 //                        //
 //                    }
-                    if(dataSnapshot.getValue() == null) {
+                    if(dataSnapshot.getValue()==(null)) {
                         Log.d("db", "no value in degree");
                         //my_degree = "4";
                         infected_since = 0l;
@@ -487,6 +489,9 @@ public class ExampleService extends Service {
                         mBuilder.setContentTitle("YOU ARE AT RISK");
                         mBuilder.setChannelId(CHANNEL_ID);
                         if (degree_infected.equals("1")) {
+
+                            Log.d("notif","onMyDegreeChange");
+                            Log.d("notif",degree_infected);
                             Log.d("db","you");
                             mBuilder.setContentText("You have come in contact with an infected individual. Tap here to know more.");
                             mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with an infected individual. Tap here to know more."));
@@ -583,15 +588,19 @@ public class ExampleService extends Service {
     };
 
     private void startDiscovery() {
+
         var = this; // store context
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
+
+
         Nearby.getConnectionsClient(this)
                 .startDiscovery("com.jpg.coronatracker", endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
         Log.d("service","in discovery");
     }
+
 
     @Override
     public void onDestroy() {
