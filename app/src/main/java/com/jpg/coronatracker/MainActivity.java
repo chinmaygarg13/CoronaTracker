@@ -22,6 +22,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -84,6 +86,10 @@ public class MainActivity extends AppCompatActivity {
         et_phone = findViewById(R.id.phone);
         b_enter = findViewById(R.id.enter);
         b_service = findViewById(R.id.service);
+        final TextView shield = findViewById(R.id.shield);
+        final ImageView person = findViewById(R.id.person);
+        final ImageView halo = findViewById(R.id.halo);
+        final TextView sertext = findViewById(R.id.sertext);
 
         if (ft == false) {
             b_enter.setVisibility(View.GONE);
@@ -91,8 +97,31 @@ public class MainActivity extends AppCompatActivity {
             et_name2.setVisibility(View.GONE);
             et_phone.setVisibility(View.GONE);
             b_service.setVisibility(View.VISIBLE);
+          shield.setVisibility(View.VISIBLE);
+            person.setVisibility(View.VISIBLE);
+            halo.setVisibility(View.VISIBLE);
+            sertext.setVisibility(View.VISIBLE);
+            sertext.setText("Tap to Restart the Shield.");
+            String level = pref.getString("degree_infected","4");
+            switch (level){
+                case "1":
+                    person.setImageResource(R.drawable.level1);
+                    shield.setText("You are INFECTED.");
+                    break;
+                case "2":
+                    person.setImageResource(R.drawable.level2);
+                    shield.setText("You are at HIGH Risk.");
+                    break;
+                case "3":
+                    person.setImageResource(R.drawable.level3);
+                    shield.setText("You are at MODERATE Risk.");
+                case "4":
+                    person.setImageResource(R.drawable.level4);
+                    shield.setText("You are doing fine.");
+            }
         }else{
-            presentShowCaseSequence();
+            presentShowCaseSequence();           
+            
         }
 
         b_enter.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
                     et_name2.setVisibility(View.GONE);
                     et_phone.setVisibility(View.GONE);
                     b_service.setVisibility(View.VISIBLE);
+                    person.setVisibility(View.VISIBLE);
                 }
             }
         });

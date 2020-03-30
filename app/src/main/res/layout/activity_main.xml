@@ -24,6 +24,7 @@
         android:layout_width = "wrap_content"
         android:hint="Enter your First Name."
         android:inputType="text"
+        android:visibility="visible"
         android:id="@+id/name1"/>
 
     <EditText
@@ -36,6 +37,7 @@
         android:layout_width = "wrap_content"
         android:hint="Enter your Last Name."
         android:inputType="text"
+        android:visibility="visible"
         android:id="@+id/name2"/>
 
     <EditText
@@ -48,6 +50,7 @@
         android:inputType="phone"
         android:id="@+id/phone"
         android:layout_width="wrap_content"
+        android:visibility="visible"
         android:layout_height="wrap_content" />
 
     <Button
@@ -59,18 +62,64 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="Enter"
         android:clickable="true"
+        android:visibility="visible"
         android:id="@+id/enter"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintVertical_bias="0.1"
+        android:text="THE SHIELD IS ON!!!"
+        android:typeface="sans"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:visibility="gone"
+        android:id="@+id/shield"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxHeight="250dp"
+        android:maxWidth="70dp"
+        app:layout_constraintVertical_bias="0.35"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/level4"
+        android:visibility="gone"
+        android:id="@+id/person"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxHeight="200dp"
+        android:maxWidth="200dp"
+        app:layout_constraintVertical_bias="0.33"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/halo"
+        android:visibility="gone"
+        android:id="@+id/halo"/>
 
     <Button
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="Start Service"
         android:onClick="startService"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:clickable="true"
+        app:layout_constraintVertical_bias="0.7"
         android:visibility="gone"
         android:id="@+id/service"/>
 
@@ -78,11 +127,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/service"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Tap to turn ON the shield."
+        android:visibility="gone"
+        android:id="@+id/sertext"/>
+
+    <!--TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/service"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintVertical_bias="0.8"
-        android:text="This app may turn off automatically in rare cases to save battery and RAM. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/>
+        android:text="This app may turn off automatically in rare cases to save battery and RAM. Please ensure that you can see the app logo in the notification bar before you go out. If not, please turn on the app once again."/-->
 
 
 <!--<Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Stop Service" android:onClick="stopService"/>-->

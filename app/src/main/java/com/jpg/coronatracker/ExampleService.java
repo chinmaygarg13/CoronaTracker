@@ -26,7 +26,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Looper;
 import android.renderscript.Sampler;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
@@ -324,7 +323,7 @@ public class ExampleService extends Service {
                     if(my_degree.equals("2"))
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                        mBuilder.setSmallIcon(R.drawable.high_risk_16);
+                        mBuilder.setSmallIcon(R.drawable.warn_notif_200_low);
                         mBuilder.setChannelId(CHANNEL_ID);
                         mBuilder.setContentTitle("YOU ARE AT RISK");
                         mBuilder.setContentText("You have come in contact with an infected individual. Tap here to know more.");
@@ -339,7 +338,7 @@ public class ExampleService extends Service {
                     else if(my_degree.equals("3"))
                     {
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                        mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setSmallIcon(R.drawable.warn_notif_200_low);
                         mBuilder.setContentTitle("YOU ARE AT RISK");
                         mBuilder.setContentText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP.");
                         mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("You have come in contact with a person who was previously in vicinity of an infected individual. Seek quarantine ASAP. Tap here to know more."));
@@ -485,7 +484,7 @@ public class ExampleService extends Service {
                     if (degree_infected.equals("2") || degree_infected.equals("1")) {
                         Log.d("db","Reaching inside, hence string");
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ExampleService.this);
-                        mBuilder.setSmallIcon(R.drawable.ic_android);
+                        mBuilder.setSmallIcon(R.drawable.warn_notif_200_low);
                         mBuilder.setContentTitle("YOU ARE AT RISK");
                         mBuilder.setChannelId(CHANNEL_ID);
                         if (degree_infected.equals("1")) {
