@@ -24,6 +24,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//import com.github.amlcurran.showcaseview.ShowcaseView;
+//import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -55,6 +57,13 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
 
         setContentView(R.layout.activity_main);
+
+//        new ShowcaseView.Builder(this)
+//                .setTarget(new ActionViewTarget(this, ActionViewTarget.Type.HOME))
+//                .setContentTitle("ShowcaseView")
+//                .setContentText("This is highlighting the Home button")
+//                .hideOnTouchOutside()
+//                .build();
 
         Boolean ft = pref.getBoolean("first_time", true);
 
@@ -244,13 +253,30 @@ public class MainActivity extends AppCompatActivity {
         sequence.setConfig(config);
         sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
                 .setTarget(new View(getApplicationContext()))
-                .setDismissText("GOT IT")
-                .setContentText("This is an app to track corona victims")
+                .setDismissText("OKAY")
+                .setContentText("This is an app to track corona victims. It is here to protect you. In order to make it function properly, please keep bluetooth on at all times.")
                 .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("In order to protect you at all times, we intend to forcefully keep your bluetooth on. Although it is not recommended, if you don't wish to do so, please force stop the app")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("The app uses 2 main permissions, Location and Phone state. \n Location is used to get access to bluetooth. \n Phone state permission to give your phone a unique ID to help you notify.")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("There are 4 degrees that we have created. \n 1. Infected \n 2. Contact with infected 3. \n Contact with degree 2 \n 4. Safe \n \n You will receive a notification if you reach degree 2 or 3. Stay Home, Stay Safe!")
+                .build());
+
+
         sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
                 .setTarget(b_enter)
                 .setDismissText("GOT IT")
-                .setContentText("This will submit your details")
+                .setContentText("The above fields are optional and not necessary to be filled. They are to protect you.")
                 .build());
         sequence.start();
     }
