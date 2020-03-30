@@ -26,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//import com.github.amlcurran.showcaseview.ShowcaseView;
+//import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -34,11 +36,22 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.target.Target;
+
 //import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     //private EditText editTextInput;
+    private static final String SHOWCASE_ID= "CoronaShowcase";
 
+    private EditText et_name1;
+    private EditText et_name2;
+    private EditText et_phone;
+    private Button b_enter ;
+    private Button b_service;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences pref = getSharedPreferences("com.jpg.coronatracker", Context.MODE_PRIVATE);
 
         setContentView(R.layout.activity_main);
+
+//        new ShowcaseView.Builder(this)
+//                .setTarget(new ActionViewTarget(this, ActionViewTarget.Type.HOME))
+//                .setContentTitle("ShowcaseView")
+//                .setContentText("This is highlighting the Home button")
+//                .hideOnTouchOutside()
+//                .build();
 
         Boolean ft = pref.getBoolean("first_time", true);
 
@@ -61,11 +81,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        final EditText et_name1 = findViewById(R.id.name1);
-        final EditText et_name2 = findViewById(R.id.name2);
-        final EditText et_phone = findViewById(R.id.phone);
-        final Button b_enter = findViewById(R.id.enter);
-        final Button b_service = findViewById(R.id.service);
+        et_name1 = findViewById(R.id.name1);
+        et_name2 = findViewById(R.id.name2);
+        et_phone = findViewById(R.id.phone);
+        b_enter = findViewById(R.id.enter);
+        b_service = findViewById(R.id.service);
         final TextView shield = findViewById(R.id.shield);
         final ImageView person = findViewById(R.id.person);
         final ImageView halo = findViewById(R.id.halo);
@@ -77,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             et_name2.setVisibility(View.GONE);
             et_phone.setVisibility(View.GONE);
             b_service.setVisibility(View.VISIBLE);
-            shield.setVisibility(View.VISIBLE);
+          shield.setVisibility(View.VISIBLE);
             person.setVisibility(View.VISIBLE);
             halo.setVisibility(View.VISIBLE);
             sertext.setVisibility(View.VISIBLE);
@@ -99,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
                     person.setImageResource(R.drawable.level4);
                     shield.setText("You are doing fine.");
             }
+        }else{
+            presentShowCaseSequence();           
+            
         }
 
         b_enter.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
     private List<String> REQUIRED_PERMISSIONS = new ArrayList<String>();
 //    private static final String[] REQUIRED_PERMISSIONS =
@@ -193,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
             }
         }
+
     }
 
     /** Called when the user has accepted (or denied) our permission request. */
@@ -244,5 +267,47 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, ExampleService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
         minimizeApp();
+    }
+
+    //This function presents the tutorial sequence
+    private void presentShowCaseSequence(){
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500);
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
+        sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
+            @Override
+            public void onShow(MaterialShowcaseView itemView, int position) {
+
+            }
+        });
+        sequence.setConfig(config);
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("This is an app to track corona victims. It is here to protect you. In order to make it function properly, please keep bluetooth on at all times.")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("In order to protect you at all times, we intend to forcefully keep your bluetooth on. Although it is not recommended, if you don't wish to do so, please force stop the app")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("The app uses 2 main permissions, Location and Phone state. \n Location is used to get access to bluetooth. \n Phone state permission to give your phone a unique ID to help you notify.")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("OKAY")
+                .setContentText("There are 4 degrees that we have created. \n 1. Infected \n 2. Contact with infected 3. \n Contact with degree 2 \n 4. Safe \n \n You will receive a notification if you reach degree 2 or 3. Stay Home, Stay Safe!")
+                .build());
+
+
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(b_enter)
+                .setDismissText("GOT IT")
+                .setContentText("The above fields are optional and not necessary to be filled. They are to protect you.")
+                .build());
+        sequence.start();
     }
 }
