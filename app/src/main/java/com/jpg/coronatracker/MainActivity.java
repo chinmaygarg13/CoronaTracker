@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                     et_phone.setVisibility(View.GONE);
                     b_service.setVisibility(View.VISIBLE);
                     person.setVisibility(View.VISIBLE);
+                    sertext.setVisibility(View.VISIBLE);
                 }
             }
         });
