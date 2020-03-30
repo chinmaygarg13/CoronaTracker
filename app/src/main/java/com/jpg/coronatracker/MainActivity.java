@@ -32,11 +32,22 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.target.Target;
+
 //import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     //private EditText editTextInput;
+    private static final String SHOWCASE_ID= "CoronaShowcase";
 
+    private EditText et_name1;
+    private EditText et_name2;
+    private EditText et_phone;
+    private Button b_enter ;
+    private Button b_service;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        final EditText et_name1 = findViewById(R.id.name1);
-        final EditText et_name2 = findViewById(R.id.name2);
-        final EditText et_phone = findViewById(R.id.phone);
-        final Button b_enter = findViewById(R.id.enter);
-        final Button b_service = findViewById(R.id.service);
+        et_name1 = findViewById(R.id.name1);
+        et_name2 = findViewById(R.id.name2);
+        et_phone = findViewById(R.id.phone);
+        b_enter = findViewById(R.id.enter);
+        b_service = findViewById(R.id.service);
 
         if (ft == false) {
             b_enter.setVisibility(View.GONE);
@@ -71,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
             et_name2.setVisibility(View.GONE);
             et_phone.setVisibility(View.GONE);
             b_service.setVisibility(View.VISIBLE);
+        }else{
+            presentShowCaseSequence();
         }
 
         b_enter.setOnClickListener(new View.OnClickListener() {
@@ -134,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
     private List<String> REQUIRED_PERMISSIONS = new ArrayList<String>();
 //    private static final String[] REQUIRED_PERMISSIONS =
@@ -164,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
             }
         }
+
     }
 
     /** Called when the user has accepted (or denied) our permission request. */
@@ -215,5 +228,30 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, ExampleService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
         minimizeApp();
+    }
+
+    //This function presents the tutorial sequence
+    private void presentShowCaseSequence(){
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500);
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
+        sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
+            @Override
+            public void onShow(MaterialShowcaseView itemView, int position) {
+
+            }
+        });
+        sequence.setConfig(config);
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(new View(getApplicationContext()))
+                .setDismissText("GOT IT")
+                .setContentText("This is an app to track corona victims")
+                .build());
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(b_enter)
+                .setDismissText("GOT IT")
+                .setContentText("This will submit your details")
+                .build());
+        sequence.start();
     }
 }
