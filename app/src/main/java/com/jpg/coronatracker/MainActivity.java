@@ -80,48 +80,57 @@ public class MainActivity extends AppCompatActivity {
                 String name = et_name1.getText().toString();
                 name += " " + et_name2.getText().toString();
                 String phone = et_phone.getText().toString();
-
-
-                TelephonyManager tMgr = (TelephonyManager) MainActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
+                Boolean cont = true;
 
                 String imei = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    imei = tMgr.getImei();
+                if(Build.VERSION.SDK_INT < 29) {
+                    TelephonyManager tMgr = (TelephonyManager) MainActivity.this.getSystemService(Context.TELEPHONY_SERVICE);
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        imei = tMgr.getImei();
+                    } else {
+                        imei = tMgr.getDeviceId();
+                    }
                 }
                 else{
-                    imei = tMgr.getDeviceId();
+                    if(phone.length() != 10){
+                        Toast.makeText(MainActivity.this, "Please enter a 10 digit mobile number", Toast.LENGTH_SHORT).show();
+                        b_enter.setClickable(true);
+                        cont = false;
+                    }
+                    else{
+                        imei = phone;
+                    }
                 }
 
+                if(cont) {
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference(imei);
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference(imei);
+                    DatabaseReference nameRef = myRef.child("name");
+                    nameRef.setValue(name);
 
-                DatabaseReference nameRef = myRef.child("name");
-                nameRef.setValue(name);
+                    DatabaseReference phoneRef = myRef.child("phone");
+                    phoneRef.setValue(phone);
 
-                DatabaseReference phoneRef = myRef.child("phone");
-                phoneRef.setValue(phone);
+                    DatabaseReference degree_infectedRef = myRef.child("degree_infected");
+                    degree_infectedRef.setValue(4);
 
-                DatabaseReference degree_infectedRef = myRef.child("degree_infected");
-                degree_infectedRef.setValue(4);
-
-                DatabaseReference date_infected_sinceRef  = myRef.child("infected_since");
-                date_infected_sinceRef.setValue(null);
-
-
+                    DatabaseReference date_infected_sinceRef = myRef.child("infected_since");
+                    date_infected_sinceRef.setValue(null);
 
 
+                    pref.edit().putString("name", name).apply();
+                    pref.edit().putString("phone", phone).apply();
+                    pref.edit().putBoolean("first_time", false).apply();
+                    pref.edit().putString("imei", imei).apply();
 
-                pref.edit().putString("name", name).apply();
-                pref.edit().putString("phone", phone).apply();
-                pref.edit().putBoolean("first_time", false).apply();
-                pref.edit().putString("imei", imei).apply();
-
-                b_enter.setVisibility(View.GONE);
-                et_name1.setVisibility(View.GONE);
-                et_name1.setVisibility(View.GONE);
-                et_phone.setVisibility(View.GONE);
-                b_service.setVisibility(View.VISIBLE);
+                    b_enter.setVisibility(View.GONE);
+                    et_name1.setVisibility(View.GONE);
+                    et_name2.setVisibility(View.GONE);
+                    et_phone.setVisibility(View.GONE);
+                    b_service.setVisibility(View.VISIBLE);
+                }
             }
         });
 
