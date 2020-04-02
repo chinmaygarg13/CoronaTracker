@@ -135,9 +135,9 @@ public class ExampleService extends Service {
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference(endPoint);
                     DatabaseReference newRef = myRef.child("location_track").push();
-                    newRef.child("location").setValue(location.getLatitude());
-                    newRef.child("accuracy").setValue(location.getAccuracy());
+                    newRef.child("latitude").setValue(location.getLatitude());
                     newRef.child("longitude").setValue(location.getLongitude());
+                    newRef.child("accuracy").setValue(location.getAccuracy());
                     newRef.child("altitude").setValue(location.getAltitude());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     String dt = sdf.format(new Date());
@@ -208,7 +208,7 @@ public class ExampleService extends Service {
                     BluetoothAdapter.getDefaultAdapter().enable();
                     startAdvertisin();
                     startDiscovery();
-                    Toast.makeText(ExampleService.this, "Corona ko bhagana hai to bluetooth hume hai ON rakhna.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExampleService.this, "The app CoronaTracker is not allowing Bluetooth to be turned OFF.", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -272,7 +272,7 @@ public class ExampleService extends Service {
 
         final Handler handler = new Handler();
 
-        Toast.makeText(this,"Adv started",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"CoronaTracker is now protecting you.",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -538,7 +538,7 @@ public class ExampleService extends Service {
             Long dt = new Date().getTime();
 
             Pair<Long, String> pair = new Pair<>(dt,discoveredEndpointInfo.getEndpointName());
-            Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(var,"Discovered",Toast.LENGTH_SHORT).show();
             Log.d("endpoint_discovered","DISCOVERED");
             Log.d("endpoint_discovered",discoveredEndpointInfo.getEndpointName());
             Log.d("endpoint_discovered",dt.toString());
