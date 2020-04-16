@@ -11,3 +11,4 @@ TODO:
 2. Boot Receiver: Start service after reboot.
 3. Turn off battery optimization for the app.
 4. Present live location of infected patients on the map (on location update of degree 1 users in the database, overwrite the entry in google sheet, using an google sheet addon display the info on a map)
+5. Warn if two people come in a range of 6 feet with each other. This functionality can be disabled by the user.
